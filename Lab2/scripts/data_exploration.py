@@ -8,29 +8,50 @@ from selenium.webdriver.chrome.service import Service
 from bs4 import BeautifulSoup
 import pdfplumber
 import pytesseract
+import csv
 
 #stock = "TSLA"
 #stock_data = yf.download(stock, start="2023-01-01", end="2025-01-01")
 
-#service = Service("/home/tsung-ting-lee/Downloads/chromedriver-linux64/chromedriver")
-#URL = ""
-#driver = webdriver.Chrome(service = service)
-#driver.get(URL)
-#soup = BeautifulSoup(driver.page_source, 'html.parser')
+service = Service("/home/tsung-ting-lee/Downloads/chromedriver-linux64/chromedriver")
+URL = "https://www.amazon.com/s?k=headphones&i=electronics&crid=37FKIKE4ZG1PF&sprefix=headphone%2Celectronics%2C200&ref=nb_sb_noss_2"
+driver = webdriver.Chrome(service = service)
+driver.get(URL)
+soup = BeautifulSoup(driver.page_source, 'html.parser')
 
+products = []
+prices = []
+for result in soup.find_all(class_=["puisg-col-inner","a-size-medium a-spacing-none a-color-base a-text-normal"]):
+	product = result.get("aria-label")
+	products.append(product)
+for result2 in soup.find_all(class_=["puisg-col-inner","a-link-normal s-no-hover s-underline-text s-underline-link-text s-link-style a-text-normal"]):
+	price = result2.find(class_="a-offscreen")
+	if price:
+		prices.append(price.text)
+	else:
+		prices.append("nan") 
 
-#$stock_data.to_csv('../data/raw_data/stock_data.csv', index=False)
+header = ["product","price"]
+product_data =zip(products, prices)
+
+with open("../data/raw_data/web_data.csv", "w") as output:
+	writer = csv.writer(output)
+	writer.writerow(header)
+	writer.writerows(product_data)
+print("file is created")
+
+#stock_data.to_csv('../data/raw_data/stock_data.csv', index=False)
 #print('saved data as csv file')
 
-with pdfplumber.open("../data/raw_data/tsla-20241023-gen.pdf") as pdf:
-	page_28 = pdf.pages[28]
-	texts = page_28.extract_text()
+#with pdfplumber.open("../data/raw_data/tsla-20241023-gen.pdf") as pdf:
+#	page_28 = pdf.pages[28]
+#	texts = page_28.extract_text()
 
 #lines = texts.strip('/n')
-data = []
-for text in texts:
-	data.append(text)
+#data = []
+#for text in texts:
+#	data.append(text)
 
-df = pd.DataFrame(data)
-df.to_csv("../data/raw_data/tsla_financial_report.csv", index=False)
-print('saved data as csv file')
+#df = pd.DataFrame(data)
+#df.to_csv("../data/raw_data/tsla_financial_report.csv", index=False)
+#print('saved data as csv file')
