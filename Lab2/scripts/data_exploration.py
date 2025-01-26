@@ -52,7 +52,3 @@ df.columns = ["Study Area","Rating", "Median/Rental Parity", "% Rental Parity", 
 df.to_csv("../data/raw_data/la_house_price.csv", index=False)
 print('saved house price data as csv file')
 
-
-print(df.head(10))
-print(df.isnull().sum())
-
