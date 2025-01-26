@@ -10,8 +10,8 @@ import pdfplumber
 import pytesseract
 import csv
 
-#stock = "TSLA"
-#stock_data = yf.download(stock, start="2023-01-01", end="2025-01-01")
+stock = "TSLA"
+stock_data = yf.download(stock, start="2023-01-01", end="2025-01-01")
 
 service = Service("/home/tsung-ting-lee/Downloads/chromedriver-linux64/chromedriver")
 URL = "https://www.amazon.com/s?k=headphones&i=electronics&crid=37FKIKE4ZG1PF&sprefix=headphone%2Celectronics%2C200&ref=nb_sb_noss_2"
@@ -40,18 +40,19 @@ with open("../data/raw_data/web_data.csv", "w") as output:
 	writer.writerows(product_data)
 print("file is created")
 
-#stock_data.to_csv('../data/raw_data/stock_data.csv', index=False)
-#print('saved data as csv file')
+stock_data.to_csv('../data/raw_data/stock_data.csv', index=False)
+print('saved data as csv file')
 
-#with pdfplumber.open("../data/raw_data/tsla-20241023-gen.pdf") as pdf:
-#	page_28 = pdf.pages[28]
-#	texts = page_28.extract_text()
+with pdfplumber.open("../data/raw_data/Los-Angeles-County-January-2024-Market-Report.pdf") as pdf:
+	page_11 = pdf.pages[10]
+	table = page_11.extract_table()
 
-#lines = texts.strip('/n')
-#data = []
-#for text in texts:
-#	data.append(text)
+df = pd.DataFrame(table)
+df.columns = ["Study Area","Rating", "Median/Rental Parity", "% Rental Parity", "Historic Premium", "% Historic Prem"]
+df.to_csv("../data/raw_data/la_house_price.csv", index=False)
+print('saved house price data as csv file')
 
-#df = pd.DataFrame(data)
-#df.to_csv("../data/raw_data/tsla_financial_report.csv", index=False)
-#print('saved data as csv file')
+
+print(df.head(10))
+print(df.isnull().sum())
+
